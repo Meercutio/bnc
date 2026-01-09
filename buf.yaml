@@ -1,0 +1,6 @@
+version: v1
+name: buf.build/meercutio/bnc
+breaking:
+  use: [FILE]
+lint:
+  use: [DEFAULT]

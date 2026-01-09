@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "github.com/meercutio/bnc/gen/go/common/v1;commonv1";
+
+message PingRequest {
+  string msg = 1;
+}
+
+message PingResponse {
+  string msg = 1;
+}
+
+service PingService {
+  rpc Ping(PingRequest) returns (PingResponse);
+}
