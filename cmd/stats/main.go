@@ -29,7 +29,7 @@ func main() {
 	ctx, stopSignals := bootstrap.WithSignals(context.Background(), logger)
 	defer stopSignals()
 
-	httpBundle := bootstrap.NewHTTP(service, logger, httpAddr)
+	httpBundle := bootstrap.NewHTTP(service, logger, httpAddr, nil)
 
 	gs, err := grpcx.New(grpcAddr)
 	if err != nil {

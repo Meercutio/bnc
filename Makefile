@@ -22,4 +22,4 @@ lint:
 	golangci-lint run
 
 gen:
-	$(COMPOSE) run --rm buf
+	$(COMPOSE) run --rm buf generate

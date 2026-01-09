@@ -18,12 +18,17 @@ type HTTPBundle struct {
 	Probe  *health.Probe
 }
 
-func NewHTTP(service string, _ *slog.Logger, addr string) *HTTPBundle {
+func NewHTTP(service string, _ *slog.Logger, addr string, register func(mux *http.ServeMux)) *HTTPBundle {
 	probe := health.New()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", probe.Liveness)
 	mux.HandleFunc("/readyz", probe.Readiness)
+
+	if register != nil {
+		register(mux)
+	}
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte(service))
 	})

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.22-alpine AS build
+FROM golang:1.24-alpine AS build
 WORKDIR /src
 RUN apk add --no-cache ca-certificates git
 
@@ -17,6 +17,7 @@ WORKDIR /app
 
 ARG SERVICE
 COPY --from=build /out/${SERVICE} /app/${SERVICE}
+COPY migrations /app/migrations
 COPY docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 

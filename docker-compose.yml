@@ -105,6 +105,10 @@ services:
       GRPC_ADDR: ":50051"
       POSTGRES_DSN: "postgres://bc:bc@postgres:5432/bc?sslmode=disable"
       KAFKA_BROKERS: "kafka:9092"
+      JWT_SECRET: "dev-secret"
+      ACCESS_TOKEN_TTL: "15m"
+      REFRESH_TOKEN_TTL: "720h"
+      MIGRATIONS_DIR: "migrations/auth"
     ports:
       - "8001:8001"
       - "50051:50051"
