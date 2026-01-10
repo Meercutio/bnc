@@ -25,10 +25,12 @@ func NewHTTP(service string, _ *slog.Logger, addr string, register func(mux *htt
 	mux.HandleFunc("/healthz", probe.Liveness)
 	mux.HandleFunc("/readyz", probe.Readiness)
 
+	// Пользовательские роуты сервиса (gateway, auth http, etc.)
 	if register != nil {
 		register(mux)
 	}
 
+	// дефолтный root
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte(service))
 	})
