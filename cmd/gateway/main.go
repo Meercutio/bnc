@@ -12,6 +12,8 @@ import (
 	"github.com/meercutio/bnc/internal/gateway/httpapi"
 	"github.com/meercutio/bnc/internal/gateway/middleware"
 	"github.com/meercutio/bnc/internal/platform/log"
+	"github.com/meercutio/bnc/internal/platform/redisx"
+	"github.com/meercutio/bnc/internal/realtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -42,6 +44,26 @@ func main() {
 	defer conn.Close()
 	authClient := authv1.NewAuthServiceClient(conn)
 
+	redisAddr := getenv("REDIS_ADDR", "redis:6379")
+	rdb := redisx.New(redisAddr)
+	defer rdb.Close()
+	if err := redisx.Ping(ctx, rdb); err != nil {
+		logger.Error("redis ping error", "err", err)
+		os.Exit(1)
+	}
+
+	hub := realtime.NewHub()
+	reg := realtime.NewRegistry(rdb)
+	wsHandler := realtime.NewWSHandler(authClient, hub, reg)
+
+	ps := realtime.NewPubSub(rdb, hub)
+	go func() {
+		if err := ps.Run(ctx); err != nil {
+			logger.Error("realtime pubsub error", "err", err)
+			os.Exit(1)
+		}
+	}()
+
 	authH := authhttp.New(authClient)
 
 	httpBundle := bootstrap.NewHTTP(service, logger, httpAddr, func(mux *http.ServeMux) {
@@ -49,6 +71,7 @@ func main() {
 		mux.HandleFunc("/auth/register", authH.Register)
 		mux.HandleFunc("/auth/login", authH.Login)
 		mux.HandleFunc("/auth/refresh", authH.Refresh)
+		mux.Handle("/ws", wsHandler)
 
 		// protected demo endpoint
 		mux.Handle("/me", middleware.RequireAuth(authClient, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
