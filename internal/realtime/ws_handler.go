@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	authv1 "github.com/meercutio/bnc/gen/go/api/proto/auth/v1"
+	authv1 "github.com/yourname/bulls-cows/gen/go/api/proto/auth/v1"
 )
 
 type WSHandler struct {

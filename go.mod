@@ -1,4 +1,4 @@
-module github.com/meercutio/bnc
+module github.com/yourname/bulls-cows
 
 go 1.24.0
 

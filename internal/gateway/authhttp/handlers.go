@@ -3,9 +3,9 @@ package authhttp
 import (
 	"net/http"
 
-	authv1 "github.com/meercutio/bnc/gen/go/api/proto/auth/v1"
-	"github.com/meercutio/bnc/internal/gateway/grpcerr"
-	"github.com/meercutio/bnc/internal/gateway/httpapi"
+	authv1 "github.com/yourname/bulls-cows/gen/go/api/proto/auth/v1"
+	"github.com/yourname/bulls-cows/internal/gateway/grpcerr"
+	"github.com/yourname/bulls-cows/internal/gateway/httpapi"
 )
 
 type Handler struct {

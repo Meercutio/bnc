@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package matchmaking.v1;
+
+option go_package = "github.com/meercutio/bnc/gen/go/matchmaking/v1;mmv1";
+
+message StartSearchRequest {
+  string user_id = 1;
+}
+
+message StartSearchResponse {
+  string status = 1;        // "queued" | "matched" | "already"
+  string match_id = 2;
+  string opponent_id = 3;
+}
+
+message CancelSearchRequest {
+  string user_id = 1;
+}
+
+message CancelSearchResponse {
+  string status = 1;        // "canceled" | "not_in_queue" | "matched"
+  string match_id = 2;
+}
+
+message StatusRequest {
+  string user_id = 1;
+}
+
+message StatusResponse {
+  string status = 1;        // "idle" | "searching" | "matched"
+  string match_id = 2;
+  string opponent_id = 3;
+}
+
+service MatchmakingService {
+  rpc StartSearch(StartSearchRequest) returns (StartSearchResponse);
+  rpc CancelSearch(CancelSearchRequest) returns (CancelSearchResponse);
+  rpc Status(StatusRequest) returns (StatusResponse);
+}

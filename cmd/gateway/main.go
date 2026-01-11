@@ -2,18 +2,20 @@ package main
 
 import (
 	"context"
+	mmv1 "github.com/yourname/bulls-cows/gen/go/api/proto/matchmaking/v1"
+	"github.com/yourname/bulls-cows/internal/gateway/mmhttp"
 	"net/http"
 	"os"
 	"time"
 
-	authv1 "github.com/meercutio/bnc/gen/go/api/proto/auth/v1"
-	"github.com/meercutio/bnc/internal/app/bootstrap"
-	"github.com/meercutio/bnc/internal/gateway/authhttp"
-	"github.com/meercutio/bnc/internal/gateway/httpapi"
-	"github.com/meercutio/bnc/internal/gateway/middleware"
-	"github.com/meercutio/bnc/internal/platform/log"
-	"github.com/meercutio/bnc/internal/platform/redisx"
-	"github.com/meercutio/bnc/internal/realtime"
+	authv1 "github.com/yourname/bulls-cows/gen/go/api/proto/auth/v1"
+	"github.com/yourname/bulls-cows/internal/app/bootstrap"
+	"github.com/yourname/bulls-cows/internal/gateway/authhttp"
+	"github.com/yourname/bulls-cows/internal/gateway/httpapi"
+	"github.com/yourname/bulls-cows/internal/gateway/middleware"
+	"github.com/yourname/bulls-cows/internal/platform/log"
+	"github.com/yourname/bulls-cows/internal/platform/redisx"
+	"github.com/yourname/bulls-cows/internal/realtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -31,6 +33,15 @@ func main() {
 
 	httpAddr := getenv("HTTP_ADDR", ":8080")
 	authAddr := getenv("AUTH_GRPC_ADDR", "auth:50051")
+	mmAddr := getenv("MATCHMAKING_GRPC_ADDR", "matchmaking:50052")
+
+	mmConn, err := dialWithRetry(mmAddr, 20*time.Second)
+	if err != nil { /* log + exit */
+	}
+	defer mmConn.Close()
+
+	mmClient := mmv1.NewMatchmakingServiceClient(mmConn)
+	mmH := mmhttp.New(mmClient)
 
 	ctx, stopSignals := bootstrap.WithSignals(context.Background(), logger)
 	defer stopSignals()
@@ -72,6 +83,9 @@ func main() {
 		mux.HandleFunc("/auth/login", authH.Login)
 		mux.HandleFunc("/auth/refresh", authH.Refresh)
 		mux.Handle("/ws", wsHandler)
+		mux.Handle("/matchmaking/start", middleware.RequireAuth(authClient, http.HandlerFunc(mmH.Start)))
+		mux.Handle("/matchmaking/cancel", middleware.RequireAuth(authClient, http.HandlerFunc(mmH.Cancel)))
+		mux.Handle("/matchmaking/status", middleware.RequireAuth(authClient, http.HandlerFunc(mmH.Status)))
 
 		// protected demo endpoint
 		mux.Handle("/me", middleware.RequireAuth(authClient, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

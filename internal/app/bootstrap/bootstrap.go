@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/meercutio/bnc/internal/platform/health"
-	"github.com/meercutio/bnc/internal/platform/httpx"
+	"github.com/yourname/bulls-cows/internal/platform/health"
+	"github.com/yourname/bulls-cows/internal/platform/httpx"
 )
 
 type HTTPBundle struct {

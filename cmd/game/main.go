@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/meercutio/bnc/internal/app/bootstrap"
-	"github.com/meercutio/bnc/internal/platform/grpcx"
-	"github.com/meercutio/bnc/internal/platform/log"
+	"github.com/yourname/bulls-cows/internal/app/bootstrap"
+	"github.com/yourname/bulls-cows/internal/platform/grpcx"
+	"github.com/yourname/bulls-cows/internal/platform/log"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
